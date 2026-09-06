@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>抽獎結果</title>
+</head>
+<body>
+    <h1>抽到了：{{ prize.name }}</h1>
+    <p>稀有度：{{ prize.rarity }}</p>
+
+    {% if prize.is_last_one %}
+        <p>🎉 這是最後一抽！額外獲得保底獎！</p>
+    {% endif %}
+
+    <a href="/draw">再抽一次</a>
+</body>
+</html>

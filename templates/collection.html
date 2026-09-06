@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>我的收藏</title>
+</head>
+<body>
+    <h1>我的收藏紀錄</h1>
+
+    {% if items %}
+        <p>目前共抽到 {{ items|length }} 個獎品</p>
+        <ul>
+            {% for item in items %}
+                <li>{{ item.name }}（稀有度：{{ item.rarity }}）</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>還沒有抽過任何獎品，快去抽獎吧！</p>
+    {% endif %}
+
+    <a href="/draw">再抽一次</a>
+</body>
+</html>
