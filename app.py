@@ -1,9 +1,20 @@
 from flask import Flask, session, render_template, redirect, url_for
+from flask_sqlalchemy import SQLAlchemy
+from werkzeug.security import generate_password_hash, check_password_hash
 import random
 
 app = Flask(__name__)
 app.secret_key = "dev-secret-key"  # 之後會解釋這是什麼
 
+# 新增：資料庫設定
+app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///ichibankuji.db"
+db = SQLAlchemy(app)
+
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(50), unique=True, nullable=False)
+    password_hash = db.Column(db.String(200), nullable=False)
+    
 PRIZES = [
     {"id": "A", "name": "S級・限定手辦", "rarity": "SS"},
     {"id": "B", "name": "亮面吊飾", "rarity": "S"},
