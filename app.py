@@ -15,6 +15,9 @@ class User(db.Model):
     username = db.Column(db.String(50), unique=True, nullable=False)
     password_hash = db.Column(db.String(200), nullable=False)
 
+def is_logged_in():
+    return "user_id" in session
+
 PRIZES = [
     {"id": "A", "name": "S級・限定手辦", "rarity": "SS"},
     {"id": "B", "name": "亮面吊飾", "rarity": "S"},
@@ -70,6 +73,9 @@ def login():
 
 @app.route("/draw")
 def draw():
+    if not is_logged_in():
+        return redirect(url_for("login"))
+
     if "stock" not in session:
         session["stock"] = {"A": 1, "B": 3, "C": 5, "D": 10, "E": 20}
 
@@ -95,7 +101,6 @@ def draw():
         "is_last_one": is_last_one,
     }
 
-    # 新增：把這次抽到的獎項，加進收藏紀錄清單裡
     if "collection" not in session:
         session["collection"] = []
 
@@ -103,12 +108,15 @@ def draw():
         "name": picked_prize["name"],
         "rarity": picked_prize["rarity"],
     })
-    session.modified = True  # 之後會解釋這行是做什麼的
+    session.modified = True
 
     return redirect(url_for("result"))
 
 @app.route("/result")
 def result():
+    if not is_logged_in():
+        return redirect(url_for("login"))
+    
     draw_data = session.get("last_draw")
 
     if not draw_data:
@@ -118,6 +126,9 @@ def result():
 
 @app.route("/collection")
 def collection():
+    if not is_logged_in():
+        return redirect(url_for("login"))
+    
     items = session.get("collection", [])
     return render_template("collection.html", items=items)
 
