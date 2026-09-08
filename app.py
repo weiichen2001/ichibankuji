@@ -71,6 +71,11 @@ def login():
 
     return render_template("login.html")
 
+@app.route("/logout")
+def logout():
+    session.pop("user_id", None)
+    return redirect(url_for("login"))
+
 @app.route("/draw")
 def draw():
     if not is_logged_in():
