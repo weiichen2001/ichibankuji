@@ -11,7 +11,7 @@
         <p>目前共抽到 {{ items|length }} 個獎品</p>
         <ul>
             {% for item in items %}
-                <li>{{ item.name }}（稀有度：{{ item.rarity }}）</li>
+                <li>{{ item.prize_name }}（稀有度：{{ item.prize_rarity }}）</li>
             {% endfor %}
         </ul>
     {% else %}

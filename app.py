@@ -21,6 +21,12 @@ class Prize(db.Model):
     rarity = db.Column(db.String(10), nullable=False)
     stock = db.Column(db.Integer, nullable=False)
 
+class Collection(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    prize_name = db.Column(db.String(100), nullable=False)
+    prize_rarity = db.Column(db.String(10), nullable=False)
+
 def is_logged_in():
     return "user_id" in session
 
@@ -113,14 +119,13 @@ def draw():
         "is_last_one": is_last_one,
     }
 
-    if "collection" not in session:
-        session["collection"] = []
-
-    session["collection"].append({
-        "name": picked_prize.name,
-        "rarity": picked_prize.rarity,
-    })
-    session.modified = True
+    new_collection_item = Collection(
+        user_id=session["user_id"],
+        prize_name=picked_prize.name,
+        prize_rarity=picked_prize.rarity,
+    )
+    db.session.add(new_collection_item)
+    db.session.commit()
 
     return redirect(url_for("result"))
 
@@ -140,8 +145,8 @@ def result():
 def collection():
     if not is_logged_in():
         return redirect(url_for("login"))
-    
-    items = session.get("collection", [])
+
+    items = Collection.query.filter_by(user_id=session["user_id"]).all()
     return render_template("collection.html", items=items)
 
 @app.route("/reset")
