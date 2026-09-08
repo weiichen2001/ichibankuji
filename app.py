@@ -1,4 +1,4 @@
-from flask import Flask, session, render_template, redirect, url_for
+from flask import Flask, session, render_template, redirect, url_for, request
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 import random
@@ -14,7 +14,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(50), unique=True, nullable=False)
     password_hash = db.Column(db.String(200), nullable=False)
-    
+
 PRIZES = [
     {"id": "A", "name": "S級・限定手辦", "rarity": "SS"},
     {"id": "B", "name": "亮面吊飾", "rarity": "S"},
@@ -27,6 +27,46 @@ LAST_ONE_PRIZE = {"id": "LAST", "name": "ラストワン賞・特製立牌", "ra
 @app.route("/")
 def home():
     return render_template("home.html")
+
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
+
+        # 檢查使用者名稱有沒有被用過
+        existing_user = User.query.filter_by(username=username).first()
+        if existing_user:
+            return "這個使用者名稱已經被註冊過了，換一個試試"
+
+        # 建立新使用者，密碼加密後存起來
+        new_user = User(
+            username=username,
+            password_hash=generate_password_hash(password, method="pbkdf2:sha256")
+        )
+        db.session.add(new_user)
+        db.session.commit()
+
+        return redirect(url_for("login"))
+
+    return render_template("register.html")
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if request.method == "POST":
+        username = request.form["username"]
+        password = request.form["password"]
+
+        user = User.query.filter_by(username=username).first()
+
+        if user is None or not check_password_hash(user.password_hash, password):
+            return "使用者名稱或密碼錯誤"
+
+        # 登入成功，把使用者id存進session，代表「這個瀏覽器現在是登入狀態」
+        session["user_id"] = user.id
+        return redirect(url_for("home"))
+
+    return render_template("login.html")
 
 @app.route("/draw")
 def draw():
