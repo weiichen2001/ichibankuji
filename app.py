@@ -15,6 +15,12 @@ class User(db.Model):
     username = db.Column(db.String(50), unique=True, nullable=False)
     password_hash = db.Column(db.String(200), nullable=False)
 
+class Prize(db.Model):
+    id = db.Column(db.String(10), primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    rarity = db.Column(db.String(10), nullable=False)
+    stock = db.Column(db.Integer, nullable=False)
+
 def is_logged_in():
     return "user_id" in session
 
@@ -81,28 +87,29 @@ def draw():
     if not is_logged_in():
         return redirect(url_for("login"))
 
-    if "stock" not in session:
-        session["stock"] = {"A": 1, "B": 3, "C": 5, "D": 10, "E": 20}
+    # 從資料庫抓出所有還有庫存的獎品
+    available_prizes = Prize.query.filter(Prize.stock > 0).all()
 
-    stock = session["stock"]
-    available_ids = [pid for pid, count in stock.items() if count > 0]
-
-    if not available_ids:
+    if not available_prizes:
         return "全部獎品都已經被抽完了！"
 
-    weights = [stock[pid] for pid in available_ids]
-    picked_id = random.choices(available_ids, weights=weights, k=1)[0]
-    stock[picked_id] -= 1
-    session["stock"] = stock
+    ids = [p.id for p in available_prizes]
+    weights = [p.stock for p in available_prizes]
 
-    picked_prize = next(p for p in PRIZES if p["id"] == picked_id)
+    picked_id = random.choices(ids, weights=weights, k=1)[0]
+    picked_prize = Prize.query.filter_by(id=picked_id).first()
 
-    total_remaining = sum(stock.values())
+    # 扣庫存，直接改資料庫裡的資料
+    picked_prize.stock -= 1
+    db.session.commit()
+
+    # 檢查是不是最後一抽（扣完之後，全部獎品庫存加起來是不是0）
+    total_remaining = db.session.query(db.func.sum(Prize.stock)).scalar()
     is_last_one = (total_remaining == 0)
 
     session["last_draw"] = {
-        "name": picked_prize["name"],
-        "rarity": picked_prize["rarity"],
+        "name": picked_prize.name,
+        "rarity": picked_prize.rarity,
         "is_last_one": is_last_one,
     }
 
@@ -110,8 +117,8 @@ def draw():
         session["collection"] = []
 
     session["collection"].append({
-        "name": picked_prize["name"],
-        "rarity": picked_prize["rarity"],
+        "name": picked_prize.name,
+        "rarity": picked_prize.rarity,
     })
     session.modified = True
 
