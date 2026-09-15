@@ -1,12 +1,13 @@
 from flask import Flask, session, render_template, redirect, url_for, request
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
+from functools import wraps
 import random
 
 app = Flask(__name__)
 app.secret_key = "dev-secret-key"  # 之後會解釋這是什麼
 
-# 新增：資料庫設定
+# 資料庫設定
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///ichibankuji.db"
 db = SQLAlchemy(app)
 
@@ -30,13 +31,14 @@ class Collection(db.Model):
 def is_logged_in():
     return "user_id" in session
 
-PRIZES = [
-    {"id": "A", "name": "S級・限定手辦", "rarity": "SS"},
-    {"id": "B", "name": "亮面吊飾", "rarity": "S"},
-    {"id": "C", "name": "壓克力立牌", "rarity": "A"},
-    {"id": "D", "name": "貼紙組", "rarity": "B"},
-    {"id": "E", "name": "明信片", "rarity": "C"},
-]
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not is_logged_in():
+            return redirect(url_for("login"))
+        return f(*args, **kwargs)
+    return decorated_function
+
 LAST_ONE_PRIZE = {"id": "LAST", "name": "ラストワン賞・特製立牌", "rarity": "LAST"}
 
 @app.route("/")
@@ -89,10 +91,8 @@ def logout():
     return redirect(url_for("login"))
 
 @app.route("/draw")
+@login_required
 def draw():
-    if not is_logged_in():
-        return redirect(url_for("login"))
-
     # 從資料庫抓出所有還有庫存的獎品
     available_prizes = Prize.query.filter(Prize.stock > 0).all()
 
@@ -130,10 +130,8 @@ def draw():
     return redirect(url_for("result"))
 
 @app.route("/result")
+@login_required
 def result():
-    if not is_logged_in():
-        return redirect(url_for("login"))
-    
     draw_data = session.get("last_draw")
 
     if not draw_data:
@@ -142,10 +140,8 @@ def result():
     return render_template("result.html", prize=draw_data)
 
 @app.route("/collection")
+@login_required
 def collection():
-    if not is_logged_in():
-        return redirect(url_for("login"))
-
     items = Collection.query.filter_by(user_id=session["user_id"]).all()
     return render_template("collection.html", items=items)
 
