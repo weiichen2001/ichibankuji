@@ -152,9 +152,10 @@ def stock():
     return render_template("stock.html", prizes=prizes)
 
 @app.route("/reset")
+@login_required
 def reset():
-    session.clear()
-    return "已經重置，庫存跟抽獎紀錄都清空了。"
+    session.pop("last_draw", None)
+    return render_template("reset.html")
 
 if __name__ == "__main__":
     app.run(debug=True)
