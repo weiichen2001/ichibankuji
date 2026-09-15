@@ -1,23 +1,25 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>我的收藏</title>
+    <title>コレクション - 一番くじ</title>
 </head>
 <body>
-    <h1>我的收藏紀錄</h1>
+    <h1>マイコレクション</h1>
 
     {% if items %}
-        <p>目前共抽到 {{ items|length }} 個獎品</p>
+        <p>これまでに {{ items|length }} 個獲得しました</p>
         <ul>
             {% for item in items %}
-                <li>{{ item.prize_name }}（稀有度：{{ item.prize_rarity }}）</li>
+                <li>{{ item.prize_name }}（レア度：{{ item.prize_rarity }}）</li>
             {% endfor %}
         </ul>
     {% else %}
-        <p>還沒有抽過任何獎品，快去抽獎吧！</p>
+        <p>まだ何も獲得していません。くじを引いてみましょう！</p>
     {% endif %}
 
-    <a href="/draw">再抽一次</a>
+    <a href="/draw">くじを引く</a>
+    <a href="/stock">残り在庫を見る</a>
+    <a href="/logout">ログアウト</a>
 </body>
 </html>

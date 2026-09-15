@@ -1,18 +1,24 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>剩餘庫存</title>
+    <title>残り在庫 - 一番くじ</title>
 </head>
 <body>
-    <h1>剩餘庫存一覽</h1>
+    <h1>残り在庫一覧</h1>
 
     <ul>
         {% for prize in prizes %}
-            <li>{{ prize.name }}（稀有度：{{ prize.rarity }}）— 剩餘 {{ prize.stock }} 個</li>
+            <li>{{ prize.name }}（レア度：{{ prize.rarity }}）— 残り {{ prize.stock }} 個</li>
         {% endfor %}
     </ul>
 
-    <a href="/draw">開始抽獎</a>
+    {% if session.user_id %}
+        <a href="/draw">くじを引く</a>
+        <a href="/collection">コレクションを見る</a>
+        <a href="/logout">ログアウト</a>
+    {% else %}
+        <a href="/">トップページへ戻る</a>
+    {% endif %}
 </body>
 </html>

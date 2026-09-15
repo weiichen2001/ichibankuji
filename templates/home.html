@@ -1,14 +1,21 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>一番賞</title>
+    <title>一番くじ</title>
 </head>
 <body>
     <h1>一番くじ</h1>
-    <p>一抽 XX 円</p>
-    <a href="/draw">開始抽獎</a>
-    <a href="/stock">查看剩餘庫存</a>
-    <a href="/logout">登出</a>
+    <p>1回 XX円</p>
+
+    {% if session.user_id %}
+        <a href="/draw">くじを引く</a>
+        <a href="/stock">残り在庫を見る</a>
+        <a href="/collection">コレクションを見る</a>
+        <a href="/logout">ログアウト</a>
+    {% else %}
+        <a href="/login">くじを引く</a>
+        <a href="/stock">残り在庫を見る</a>
+    {% endif %}
 </body>
 </html>

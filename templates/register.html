@@ -1,15 +1,24 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="ja">
+
 <head>
     <meta charset="UTF-8">
-    <title>註冊</title>
+    <title>新規登録 - 一番くじ</title>
 </head>
+
 <body>
-    <h1>建立帳號</h1>
+    <h1>アカウント作成</h1>
+
+    {% if error %}
+    <p style="color: red;">{{ error }}</p>
+    {% endif %}
+    
     <form method="POST">
-        <label>使用者名稱：<input type="text" name="username" required></label><br>
-        <label>密碼：<input type="password" name="password" required></label><br>
-        <button type="submit">註冊</button>
+        <label>ユーザー名：<input type="text" name="username" required></label><br>
+        <label>パスワード：<input type="password" name="password" required></label><br>
+        <button type="submit">登録する</button>
     </form>
+    <a href="/">トップページへ戻る</a>
 </body>
+
 </html>

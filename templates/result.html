@@ -1,17 +1,26 @@
 <!DOCTYPE html>
-<html lang="zh-Hant">
+<html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>抽獎結果</title>
+    <title>結果 - 一番くじ</title>
 </head>
 <body>
-    <h1>抽到了：{{ prize.name }}</h1>
-    <p>稀有度：{{ prize.rarity }}</p>
+    <h1>結果発表</h1>
 
-    {% if prize.is_last_one %}
-        <p>🎉 這是最後一抽！額外獲得保底獎！</p>
-    {% endif %}
+    {% for prize in results %}
+        <div>
+            <h2>{{ prize.name }}</h2>
+            <p>レア度：{{ prize.rarity }}</p>
+            {% if prize.is_last_one %}
+                <p>🎉 ラストワン賞！特別に「ラストワン賞・特製立牌」も獲得しました！</p>
+            {% endif %}
+        </div>
+        <hr>
+    {% endfor %}
 
-    <a href="/draw">再抽一次</a>
+    <a href="/draw">もう一度引く</a>
+    <a href="/">トップページへ戻る</a>
+    <a href="/collection">コレクションを見る</a>
+    <a href="/stock">残り在庫を見る</a>
 </body>
 </html>

@@ -5,9 +5,8 @@ from functools import wraps
 import random
 
 app = Flask(__name__)
-app.secret_key = "dev-secret-key"  # 之後會解釋這是什麼
+app.secret_key = "dev-secret-key"
 
-# 資料庫設定
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///ichibankuji.db"
 db = SQLAlchemy(app)
 
@@ -39,7 +38,65 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
-LAST_ONE_PRIZE = {"id": "LAST", "name": "ラストワン賞・特製立牌", "rarity": "LAST"}
+# 這一盒的初始庫存，補貨時會用這份資料重新補滿
+INITIAL_STOCK = {"A": 1, "B": 3, "C": 5, "D": 10, "E": 20}
+
+def restock_prizes():
+    """把所有獎品的庫存補回初始數量，代表「開新的一盒」"""
+    for pid, count in INITIAL_STOCK.items():
+        prize = Prize.query.filter_by(id=pid).first()
+        if prize:
+            prize.stock = count
+    db.session.commit()
+
+def perform_single_draw(user_id):
+    """執行一次抽獎，回傳這次抽到的結果（dict）。庫存歸零時會自動補貨。"""
+    available_prizes = Prize.query.filter(Prize.stock > 0).all()
+
+    if not available_prizes:
+        return None
+
+    ids = [p.id for p in available_prizes]
+    weights = [p.stock for p in available_prizes]
+
+    picked_id = random.choices(ids, weights=weights, k=1)[0]
+    picked_prize = Prize.query.filter_by(id=picked_id).first()
+
+    picked_prize.stock -= 1
+    db.session.commit()
+
+    total_remaining = db.session.query(db.func.sum(Prize.stock)).scalar()
+    is_last_one = (total_remaining == 0)
+
+    new_collection_item = Collection(
+        user_id=user_id,
+        prize_name=picked_prize.name,
+        prize_rarity=picked_prize.rarity,
+    )
+    db.session.add(new_collection_item)
+    db.session.commit()
+
+    result = {
+        "name": picked_prize.name,
+        "rarity": picked_prize.rarity,
+        "is_last_one": is_last_one,
+    }
+
+    # 這一盒抽完了，自動開新盒（補貨），讓十連抽可以無縫繼續
+    if is_last_one:
+        restock_prizes()
+
+    return result
+
+def perform_ten_draw(user_id):
+    """執行十連抽，回傳10筆結果組成的清單"""
+    results = []
+    for _ in range(10):
+        result = perform_single_draw(user_id)
+        if result is None:
+            break
+        results.append(result)
+    return results
 
 @app.route("/")
 def home():
@@ -51,12 +108,10 @@ def register():
         username = request.form["username"]
         password = request.form["password"]
 
-        # 檢查使用者名稱有沒有被用過
         existing_user = User.query.filter_by(username=username).first()
         if existing_user:
-            return "這個使用者名稱已經被註冊過了，換一個試試"
+            return render_template("register.html", error="このユーザー名はすでに使用されています。別の名前をお試しください。")
 
-        # 建立新使用者，密碼加密後存起來
         new_user = User(
             username=username,
             password_hash=generate_password_hash(password, method="pbkdf2:sha256")
@@ -77,9 +132,8 @@ def login():
         user = User.query.filter_by(username=username).first()
 
         if user is None or not check_password_hash(user.password_hash, password):
-            return "使用者名稱或密碼錯誤"
+            return render_template("login.html", error="ユーザー名またはパスワードが正しくありません。")
 
-        # 登入成功，把使用者id存進session，代表「這個瀏覽器現在是登入狀態」
         session["user_id"] = user.id
         return redirect(url_for("home"))
 
@@ -92,52 +146,40 @@ def logout():
 
 @app.route("/draw")
 @login_required
-def draw():
-    # 從資料庫抓出所有還有庫存的獎品
-    available_prizes = Prize.query.filter(Prize.stock > 0).all()
+def draw_select():
+    return render_template("draw_select.html")
 
-    if not available_prizes:
-        return "全部獎品都已經被抽完了！"
+@app.route("/draw/single")
+@login_required
+def draw_single():
+    result = perform_single_draw(session["user_id"])
 
-    ids = [p.id for p in available_prizes]
-    weights = [p.stock for p in available_prizes]
+    if result is None:
+        return redirect(url_for("home"))
 
-    picked_id = random.choices(ids, weights=weights, k=1)[0]
-    picked_prize = Prize.query.filter_by(id=picked_id).first()
+    session["last_draw"] = [result]
+    return redirect(url_for("result"))
 
-    # 扣庫存，直接改資料庫裡的資料
-    picked_prize.stock -= 1
-    db.session.commit()
+@app.route("/draw/ten")
+@login_required
+def draw_ten():
+    results = perform_ten_draw(session["user_id"])
 
-    # 檢查是不是最後一抽（扣完之後，全部獎品庫存加起來是不是0）
-    total_remaining = db.session.query(db.func.sum(Prize.stock)).scalar()
-    is_last_one = (total_remaining == 0)
+    if not results:
+        return redirect(url_for("home"))
 
-    session["last_draw"] = {
-        "name": picked_prize.name,
-        "rarity": picked_prize.rarity,
-        "is_last_one": is_last_one,
-    }
-
-    new_collection_item = Collection(
-        user_id=session["user_id"],
-        prize_name=picked_prize.name,
-        prize_rarity=picked_prize.rarity,
-    )
-    db.session.add(new_collection_item)
-    db.session.commit()
-
+    session["last_draw"] = results
     return redirect(url_for("result"))
 
 @app.route("/result")
 @login_required
 def result():
-    draw_data = session.get("last_draw")
+    results = session.get("last_draw")
 
-    if not draw_data:
+    if not results:
         return redirect(url_for("home"))
 
-    return render_template("result.html", prize=draw_data)
+    return render_template("result.html", results=results)
 
 @app.route("/collection")
 @login_required
@@ -146,7 +188,6 @@ def collection():
     return render_template("collection.html", items=items)
 
 @app.route("/stock")
-@login_required
 def stock():
     prizes = Prize.query.all()
     return render_template("stock.html", prizes=prizes)
