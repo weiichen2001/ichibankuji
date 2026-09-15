@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>剩餘庫存</title>
+</head>
+<body>
+    <h1>剩餘庫存一覽</h1>
+
+    <ul>
+        {% for prize in prizes %}
+            <li>{{ prize.name }}（稀有度：{{ prize.rarity }}）— 剩餘 {{ prize.stock }} 個</li>
+        {% endfor %}
+    </ul>
+
+    <a href="/draw">開始抽獎</a>
+</body>
+</html>

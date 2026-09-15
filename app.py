@@ -145,6 +145,12 @@ def collection():
     items = Collection.query.filter_by(user_id=session["user_id"]).all()
     return render_template("collection.html", items=items)
 
+@app.route("/stock")
+@login_required
+def stock():
+    prizes = Prize.query.all()
+    return render_template("stock.html", prizes=prizes)
+
 @app.route("/reset")
 def reset():
     session.clear()
