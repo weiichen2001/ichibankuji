@@ -216,3 +216,42 @@ body {
     color: #1a1a1a;
     text-decoration: underline;
 }
+
+.draw-select-container {
+    width: 500px;
+    background-color: white;
+    border: 3px solid #1a1a1a;
+    border-radius: 16px;
+    padding: 36px 30px;
+    position: relative;
+    text-align: center;
+}
+
+.draw-select-photo {
+    width: 260px;
+    height: 260px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 5px solid #1a1a1a;
+    margin: 0 auto 24px;
+    display: block;
+}
+
+.draw-select-title {
+    font-family: "Dela Gothic One", sans-serif;
+    font-size: 30px;
+    color: #1a1a1a;
+    margin-bottom: 28px;
+}
+
+.draw-select-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: center;
+}
+
+.draw-select-buttons .home-cta-button {
+    width: 240px;
+    font-size: 22px;
+}

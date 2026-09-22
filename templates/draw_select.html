@@ -3,13 +3,29 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Mochiy+Pop+One&display=swap" rel="stylesheet">
     <title>くじを引く - 一番くじ</title>
 </head>
 <body>
-    <h1>何回引きますか？</h1>
-    <a href="/draw/single">1回引く</a>
-    <a href="/draw/ten">10回引く</a>
-    <br><br>
-    <a href="/">トップページへ戻る</a>
+    <div class="draw-select-container">
+        <div class="star-deco star-yellow" style="top: -18px; left: -18px; transform: rotate(-15deg);"></div>
+        <div class="star-deco star-black" style="top: -14px; right: -20px; transform: rotate(20deg);"></div>
+        <div class="star-deco star-yellow" style="bottom: -16px; right: -16px; transform: rotate(40deg);"></div>
+        <div class="star-deco star-black" style="bottom: -14px; left: 10px; transform: rotate(-30deg);"></div>
+
+        <img src="{{ url_for('static', filename='images/draw-select-cat.png') }}" class="draw-select-photo" alt="くじを引く">
+
+        <h1 class="draw-select-title">何回引きますか？</h1>
+
+        <div class="draw-select-buttons">
+            <a href="/draw/single" class="home-cta-button home-cta-button-y">1回引く</a>
+            <a href="/draw/ten" class="home-cta-button home-cta-button-b">10回引く</a>
+        </div>
+
+        <br>
+        <a href="/">トップページへ戻る</a>
+    </div>
 </body>
 </html>
