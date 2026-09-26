@@ -3,23 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Mochiy+Pop+One&display=swap" rel="stylesheet">
     <title>残り在庫 - 一番くじ</title>
 </head>
 <body>
-    <h1>残り在庫一覧</h1>
+    <div class="result-container">
+        <h1 class="result-heading">残り在庫一覧</h1>
 
-    <ul>
-        {% for prize in prizes %}
-            <li>{{ prize.name }}（レア度：{{ prize.rarity }}）— 残り {{ prize.stock }} 個</li>
-        {% endfor %}
-    </ul>
+        <div class="stock-grid">
+            {% for prize in prizes %}
+                <div class="result-card stock-card {% if prize.stock == 0 %}stock-card-empty{% endif %}">
+                    {% if prize.image %}
+                        <img src="{{ url_for('static', filename='images/' + prize.image) }}" class="result-card-image" alt="{{ prize.name }}">
+                    {% endif %}
+                    <div class="result-card-rarity">{{ prize.rarity }}</div>
+                    <div class="result-card-name">{{ prize.name }}</div>
+                    {% if prize.stock > 0 %}
+                        <div class="stock-count">残り {{ prize.stock }} 個</div>
+                    {% else %}
+                        <div class="stock-soldout">SOLD OUT</div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
 
-    {% if session.user_id %}
-        <a href="/draw">くじを引く</a>
-        <a href="/collection">コレクションを見る</a>
-        <a href="/logout">ログアウト</a>
-    {% else %}
-        <a href="/">トップページへ戻る</a>
-    {% endif %}
+        {% if session.user_id %}
+            <div class="draw-select-buttons">
+                <a href="/draw" class="home-cta-button home-cta-button-y">くじを引く</a>
+            </div>
+            <div class="auth-links">
+                <a href="/collection">コレクションを見る</a> |
+                <a href="/logout">ログアウト</a>
+            </div>
+        {% else %}
+            <div class="auth-links">
+                <a href="/">トップページへ戻る</a>
+            </div>
+        {% endif %}
+    </div>
 </body>
 </html>

@@ -316,3 +316,45 @@ body {
     font-size: 14px;
     margin-top: 8px;
 }
+
+.stock-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.stock-card {
+    margin-bottom: 0;
+}
+
+.stock-card-empty {
+    opacity: 0.45;
+}
+
+.stock-count {
+    font-family: "Mochiy Pop One", sans-serif;
+    font-size: 14px;
+    color: #1a1a1a;
+    margin-top: 6px;
+}
+
+.stock-soldout {
+    font-family: "Dela Gothic One", sans-serif;
+    font-size: 14px;
+    color: #d92626;
+    margin-top: 6px;
+}
+
+.collection-total {
+    font-family: "Mochiy Pop One", sans-serif;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+.collection-empty {
+    font-family: "Mochiy Pop One", sans-serif;
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 24px;
+}

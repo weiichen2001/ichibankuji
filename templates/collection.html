@@ -3,24 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Mochiy+Pop+One&display=swap" rel="stylesheet">
     <title>コレクション - 一番くじ</title>
 </head>
 <body>
-    <h1>マイコレクション</h1>
+    <div class="result-container">
+        <h1 class="result-heading">マイコレクション</h1>
 
-    {% if items %}
-        <p>これまでに {{ items|length }} 個獲得しました</p>
-        <ul>
-            {% for item in items %}
-                <li>{{ item.prize_name }}（レア度：{{ item.prize_rarity }}）</li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p>まだ何も獲得していません。くじを引いてみましょう！</p>
-    {% endif %}
+        {% if items %}
+            <p class="collection-total">これまでに {{ total }} 個獲得しました</p>
 
-    <a href="/draw">くじを引く</a>
-    <a href="/stock">残り在庫を見る</a>
-    <a href="/logout">ログアウト</a>
+            <div class="stock-grid">
+                {% for item in items %}
+                    <div class="result-card stock-card">
+                        {% if item.image %}
+                            <img src="{{ url_for('static', filename='images/' + item.image) }}" class="result-card-image" alt="{{ item.name }}">
+                        {% endif %}
+                        <div class="result-card-rarity">{{ item.rarity }}</div>
+                        <div class="result-card-name">{{ item.name }}</div>
+                        <div class="stock-count">× {{ item.count }}</div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="collection-empty">まだ何も獲得していません。くじを引いてみましょう！</p>
+        {% endif %}
+
+        <div class="draw-select-buttons">
+            <a href="/draw" class="home-cta-button home-cta-button-y">くじを引く</a>
+        </div>
+        <div class="auth-links">
+            <a href="/stock">残り在庫を見る</a> |
+            <a href="/logout">ログアウト</a>
+        </div>
+    </div>
 </body>
 </html>

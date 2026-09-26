@@ -200,12 +200,37 @@ def result():
 @login_required
 def collection():
     items = Collection.query.filter_by(user_id=session["user_id"]).all()
-    return render_template("collection.html", items=items)
+
+    summary = {}
+    for item in items:
+        key = (item.prize_name, item.prize_rarity)
+        summary[key] = summary.get(key, 0) + 1
+
+    collection_list = []
+    for (name, rarity), count in summary.items():
+        images = PRIZE_IMAGES.get(rarity[0] if rarity != "ラストワン賞" else "LAST", [])
+        collection_list.append({
+            "name": name,
+            "rarity": rarity,
+            "count": count,
+            "image": images[0] if images else None,
+        })
+
+    return render_template("collection.html", items=collection_list, total=len(items))
 
 @app.route("/stock")
 def stock():
     prizes = Prize.query.all()
-    return render_template("stock.html", prizes=prizes)
+    prize_list = []
+    for p in prizes:
+        images = PRIZE_IMAGES.get(p.id, [])
+        prize_list.append({
+            "name": p.name,
+            "rarity": p.rarity,
+            "stock": p.stock,
+            "image": images[0] if images else None,
+        })
+    return render_template("stock.html", prizes=prize_list)
 
 @app.route("/reset")
 @login_required
