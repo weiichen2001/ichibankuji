@@ -255,3 +255,64 @@ body {
     width: 240px;
     font-size: 22px;
 }
+
+.result-container {
+    width: 500px;
+    background-color: white;
+    border: 3px solid #1a1a1a;
+    border-radius: 16px;
+    padding: 36px 30px;
+    text-align: center;
+}
+
+.result-heading {
+    font-family: "Dela Gothic One", sans-serif;
+    font-size: 28px;
+    margin-bottom: 24px;
+}
+
+.result-card {
+    border: 2px solid #1a1a1a;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 16px;
+    background-color: #fdf8ee;
+}
+
+.result-card-image {
+    width: 160px;
+    height: 160px;
+    object-fit: contain;
+    display: block;
+    margin: 0 auto 12px;
+}
+
+.result-card-rarity {
+    font-family: "Mochiy Pop One", sans-serif;
+    background-color: #1a1a1a;
+    color: white;
+    display: inline-block;
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    margin-bottom: 8px;
+}
+
+.result-card-name {
+    font-family: "Dela Gothic One", sans-serif;
+    font-size: 20px;
+    color: #1a1a1a;
+}
+
+.result-card-lastone {
+    background-color: #fff4d6;
+    border-color: #FFD313;
+    border-width: 3px;
+}
+
+.result-card-badge {
+    font-family: "Mochiy Pop One", sans-serif;
+    color: #d92626;
+    font-size: 14px;
+    margin-top: 8px;
+}

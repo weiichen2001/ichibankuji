@@ -41,6 +41,15 @@ def login_required(f):
 # 這一盒的初始庫存，補貨時會用這份資料重新補滿
 INITIAL_STOCK = {"A": 1, "B": 3, "C": 5, "D": 10, "E": 20}
 
+PRIZE_IMAGES = {
+    "A": ["prizes/a_figure.png"],
+    "B": ["prizes/b_bowl.png"],
+    "C": ["prizes/c_pouch_1.png", "prizes/c_pouch_2.png"],
+    "D": ["prizes/d_keychain_1.png", "prizes/d_keychain_2.png", "prizes/d_keychain_3.png"],
+    "E": ["prizes/e_sticker_1.png", "prizes/e_sticker_2.png"],
+    "LAST": ["prizes/last_cushion.png"],
+}
+
 def restock_prizes():
     """把所有獎品的庫存補回初始數量，代表「開新的一盒」"""
     for pid, count in INITIAL_STOCK.items():
@@ -76,15 +85,21 @@ def perform_single_draw(user_id):
     db.session.add(new_collection_item)
     db.session.commit()
 
+    image_choices = PRIZE_IMAGES.get(picked_id, [])
+    image_path = random.choice(image_choices) if image_choices else None
+
     result = {
         "name": picked_prize.name,
         "rarity": picked_prize.rarity,
         "is_last_one": is_last_one,
+        "image": image_path,
     }
 
     # 這一盒抽完了，自動開新盒（補貨），讓十連抽可以無縫繼續
     if is_last_one:
         restock_prizes()
+        last_one_images = PRIZE_IMAGES.get("LAST", [])
+        result["last_one_image"] = random.choice(last_one_images) if last_one_images else None
 
     return result
 

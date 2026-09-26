@@ -3,25 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Mochiy+Pop+One&display=swap" rel="stylesheet">
     <title>結果 - 一番くじ</title>
 </head>
 <body>
-    <h1>結果発表</h1>
+    <div class="result-container">
+        <h1 class="result-heading">結果発表</h1>
 
-    {% for prize in results %}
-        <div>
-            <h2>{{ prize.name }}</h2>
-            <p>レア度：{{ prize.rarity }}</p>
+        {% for prize in results %}
+            <div class="result-card">
+                {% if prize.image %}
+                    <img src="{{ url_for('static', filename='images/' + prize.image) }}" class="result-card-image" alt="{{ prize.name }}">
+                {% endif %}
+                <div class="result-card-rarity">{{ prize.rarity }}</div>
+                <div class="result-card-name">{{ prize.name }}</div>
+            </div>
+
             {% if prize.is_last_one %}
-                <p>🎉 ラストワン賞！特別に「ラストワン賞・特製立牌」も獲得しました！</p>
+                <div class="result-card result-card-lastone">
+                    {% if prize.last_one_image %}
+                        <img src="{{ url_for('static', filename='images/' + prize.last_one_image) }}" class="result-card-image" alt="ラストワン賞">
+                    {% endif %}
+                    <div class="result-card-rarity">ラストワン賞</div>
+                    <div class="result-card-name">抱枕</div>
+                    <div class="result-card-badge">🎉 ラストワン賞ボーナス！</div>
+                </div>
             {% endif %}
-        </div>
-        <hr>
-    {% endfor %}
+        {% endfor %}
 
-    <a href="/draw">もう一度引く</a>
-    <a href="/">トップページへ戻る</a>
-    <a href="/collection">コレクションを見る</a>
-    <a href="/stock">残り在庫を見る</a>
+        <div class="draw-select-buttons">
+            <a href="/draw" class="home-cta-button home-cta-button-y">もう一度引く</a>
+        </div>
+        <div class="auth-links">
+            <a href="/">トップページへ戻る</a> |
+            <a href="/collection">コレクションを見る</a> |
+            <a href="/stock">残り在庫を見る</a>
+        </div>
+    </div>
 </body>
 </html>
