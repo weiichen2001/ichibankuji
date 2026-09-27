@@ -41,6 +41,7 @@ def login_required(f):
 
 # 這一盒的初始庫存，補貨時會用這份資料重新補滿
 INITIAL_STOCK = {"A": 1, "B": 3, "C": 5, "D": 10, "E": 20}
+PRICE = 800  # 一次抽獎的價格，之後要改價錢改這裡就好
 
 PRIZE_IMAGES = {
     "A": ["prizes/a_figure.png"],
@@ -133,7 +134,7 @@ def perform_ten_draw(user_id):
 
 @app.route("/")
 def home():
-    return render_template("home.html")
+    return render_template("home.html", price=PRICE)
 
 @app.route("/register", methods=["GET", "POST"])
 def register():

@@ -2,33 +2,38 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>一番くじ｜うちのホコリ!!</title>
     <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Mochiy+Pop+One&display=swap" rel="stylesheet">
-    <title>一番くじ</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <div class="page-container">
-        <img src="{{ url_for('static', filename='images/home-cover.png') }}" class="home-cover" alt="一番くじ うちのホコリ">
+    <div class="home-v2-page">
+        <img src="{{ url_for('static', filename='images/logo.png') }}" alt="一番くじ" class="home-v2-logo">
 
-        <div class="home-title">うちの<br>ホコリ!!</div>
-        <div class="home-price">1回<br>700円</div>
+        <img src="{{ url_for('static', filename='images/home-cat.png') }}" alt="猫" class="home-v2-cat">
 
-        <div class="home-actions">
-            {% if session.user_id %}
-                <a href="/draw" class="home-cta-button home-cta-button-y">くじを引く</a>
-                <div class="auth-links">
-                    <a href="/stock">残り在庫を見る</a> |
-                    <a href="/collection">コレクションを見る</a> |
-                    <a href="/logout">ログアウト</a>
-                </div>
-            {% else %}
-                <a href="/login" class="home-cta-button home-cta-button-y">くじを引く</a>
-                <div class="auth-links">
-                    <a href="/stock">残り在庫を見る</a>
-                </div>
-            {% endif %}
+        <h1 class="home-v2-title">うちの<br>ホコリ!!</h1>
+
+        <div class="home-v2-actions">
+            <a href="{{ url_for('draw_select') }}" class="home-ticket-btn">
+                <span class="home-ticket-stub">
+                    <span class="unit">1回</span>
+                    <span class="price">¥{{ price }}</span>
+                </span>
+                <span class="home-ticket-main">くじを引く</span>
+            </a>
+
+            <div class="home-v2-links-row">
+                <a href="{{ url_for('stock') }}" class="home-v2-link">残り在庫を見る</a>
+                {% if session.user_id %}
+                    <a href="{{ url_for('collection') }}" class="home-v2-link">コレクションを見る</a>
+                    <a href="{{ url_for('logout') }}" class="home-v2-link">ログアウト</a>
+                {% else %}
+                    <a href="{{ url_for('login') }}" class="home-v2-link">ログイン</a>
+                    <a href="{{ url_for('register') }}" class="home-v2-link">新規登録</a>
+                {% endif %}
+            </div>
         </div>
     </div>
 </body>

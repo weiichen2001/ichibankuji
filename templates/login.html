@@ -1,24 +1,30 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Mochiy+Pop+One&display=swap" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Mochiy+Pop+One&family=Rampart+One&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Mochiy+Pop+One&display=swap"
+        rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Mochiy+Pop+One&family=Rampart+One&display=swap"
+        rel="stylesheet">
     <title>ログイン - 一番くじ</title>
 </head>
+
 <body>
     <div class="auth-container">
-        <div class="star-deco star-yellow" style="top: -18px; left: -18px; transform: rotate(-15deg);"></div>
-        <div class="star-deco star-black" style="top: -14px; right: -20px; transform: rotate(20deg);"></div>
-        <div class="star-deco star-yellow" style="bottom: -16px; right: 30px; transform: rotate(40deg);"></div>
+        <div class="star-deco star-yellow star-lg" style="top:-20px; left:-20px; transform:rotate(15deg);"></div>
+        <div class="star-deco star-black star-sm" style="top:-15px; right:-15px; transform:rotate(-10deg);"></div>
+        <div class="star-deco star-white star-md" style="bottom:-18px; left:-18px; transform:rotate(-20deg);"></div>
+        <div class="star-deco star-yellow star-xs" style="bottom:-12px; right:-12px; transform:rotate(8deg);"></div>
 
         <h1 class="auth-title">ログイン</h1>
 
         {% if error %}
-            <p class="auth-error">{{ error }}</p>
+        <p class="auth-error">{{ error }}</p>
         {% endif %}
 
         <form method="POST">
@@ -37,4 +43,5 @@
         </div>
     </div>
 </body>
+
 </html>
