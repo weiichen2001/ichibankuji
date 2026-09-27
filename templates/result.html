@@ -6,6 +6,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Mochiy+Pop+One&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Mochiy+Pop+One&family=Rampart+One&display=swap" rel="stylesheet">
     <title>結果 - 一番くじ</title>
 </head>
 <body>
@@ -19,6 +20,9 @@
                 {% endif %}
                 <div class="result-card-rarity">{{ prize.rarity }}</div>
                 <div class="result-card-name">{{ prize.name }}</div>
+                {% if prize.variant_total and prize.variant_total > 1 %}
+                    <div class="result-card-variant">{{ prize.rarity[0] }}-{{ prize.variant_index + 1 }}（全{{ prize.variant_total }}種・ランダム）</div>
+                {% endif %}
             </div>
 
             {% if prize.is_last_one %}

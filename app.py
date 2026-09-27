@@ -25,7 +25,8 @@ class Collection(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     prize_name = db.Column(db.String(100), nullable=False)
-    prize_rarity = db.Column(db.String(10), nullable=False)
+    prize_rarity = db.Column(db.String(20), nullable=False)
+    variant_index = db.Column(db.Integer, nullable=True)
 
 def is_logged_in():
     return "user_id" in session
@@ -47,7 +48,7 @@ PRIZE_IMAGES = {
     "C": ["prizes/c_pouch_1.png", "prizes/c_pouch_2.png"],
     "D": ["prizes/d_keychain_1.png", "prizes/d_keychain_2.png", "prizes/d_keychain_3.png"],
     "E": ["prizes/e_sticker_1.png", "prizes/e_sticker_2.png"],
-    "LAST": ["prizes/last_cushion.png"],
+    "LAST": ["prizes/last_one.png"],
 }
 
 def restock_prizes():
@@ -77,22 +78,31 @@ def perform_single_draw(user_id):
     total_remaining = db.session.query(db.func.sum(Prize.stock)).scalar()
     is_last_one = (total_remaining == 0)
 
+    # 先算出這次抽到第幾款花色
+    image_choices = PRIZE_IMAGES.get(picked_id, [])
+    variant_index = None
+    image_path = None
+    if image_choices:
+        variant_index = random.randint(0, len(image_choices) - 1)
+        image_path = image_choices[variant_index]
+
+    # 再用算好的 variant_index 建立收藏紀錄
     new_collection_item = Collection(
         user_id=user_id,
         prize_name=picked_prize.name,
         prize_rarity=picked_prize.rarity,
+        variant_index=variant_index,
     )
     db.session.add(new_collection_item)
     db.session.commit()
-
-    image_choices = PRIZE_IMAGES.get(picked_id, [])
-    image_path = random.choice(image_choices) if image_choices else None
 
     result = {
         "name": picked_prize.name,
         "rarity": picked_prize.rarity,
         "is_last_one": is_last_one,
         "image": image_path,
+        "variant_index": variant_index,
+        "variant_total": len(image_choices),
     }
 
     # 這一盒抽完了，自動開新盒（補貨），讓十連抽可以無縫繼續
@@ -100,6 +110,14 @@ def perform_single_draw(user_id):
         restock_prizes()
         last_one_images = PRIZE_IMAGES.get("LAST", [])
         result["last_one_image"] = random.choice(last_one_images) if last_one_images else None
+
+        last_one_item = Collection(
+            user_id=user_id,
+            prize_name="抱枕",
+            prize_rarity="ラストワン賞",
+        )
+        db.session.add(last_one_item)
+        db.session.commit()
 
     return result
 
@@ -203,17 +221,30 @@ def collection():
 
     summary = {}
     for item in items:
-        key = (item.prize_name, item.prize_rarity)
+        key = (item.prize_name, item.prize_rarity, item.variant_index)
         summary[key] = summary.get(key, 0) + 1
 
     collection_list = []
-    for (name, rarity), count in summary.items():
-        images = PRIZE_IMAGES.get(rarity[0] if rarity != "ラストワン賞" else "LAST", [])
+    for (name, rarity, variant_index), count in summary.items():
+        image_key = rarity[0] if rarity != "ラストワン賞" else "LAST"
+        images = PRIZE_IMAGES.get(image_key, [])
+
+        image = None
+        if variant_index is not None and variant_index < len(images):
+            image = images[variant_index]
+        elif images:
+            image = images[0]
+
+        variant_label = None
+        if variant_index is not None and len(images) > 1:
+            variant_label = f"{rarity[0]}-{variant_index + 1}"
+
         collection_list.append({
             "name": name,
             "rarity": rarity,
             "count": count,
-            "image": images[0] if images else None,
+            "image": image,
+            "variant_label": variant_label,
         })
 
     return render_template("collection.html", items=collection_list, total=len(items))

@@ -12,25 +12,22 @@
     <div class="page-container">
         <img src="{{ url_for('static', filename='images/home-cover.png') }}" class="home-cover" alt="一番くじ うちのホコリ">
 
-<div class="title">
-    <div class="title-uchi">うち</div>
-    <div class="title-no">の</div>
-    <div class="title-hokori">ホコリ</div>
-    <div class="title-bikuri">!!</div>
-</div>
-        
-
-        <div class="home-price">1回700円</div>
+        <div class="home-title">うちの<br>ホコリ!!</div>
+        <div class="home-price">1回<br>700円</div>
 
         <div class="home-actions">
             {% if session.user_id %}
                 <a href="/draw" class="home-cta-button home-cta-button-y">くじを引く</a>
-                <a href="/stock" class="home-cta-button home-cta-button-b">残り在庫を見る</a>
-                <a href="/collection" class="home-cta-button home-cta-button-y">コレクションを見る</a>
-                <a href="/logout" class="home-cta-button home-cta-button-b">ログアウト</a>
+                <div class="auth-links">
+                    <a href="/stock">残り在庫を見る</a> |
+                    <a href="/collection">コレクションを見る</a> |
+                    <a href="/logout">ログアウト</a>
+                </div>
             {% else %}
                 <a href="/login" class="home-cta-button home-cta-button-y">くじを引く</a>
-                <a href="/stock" class="home-cta-button home-cta-button-b">残り在庫を見る</a>
+                <div class="auth-links">
+                    <a href="/stock">残り在庫を見る</a>
+                </div>
             {% endif %}
         </div>
     </div>
